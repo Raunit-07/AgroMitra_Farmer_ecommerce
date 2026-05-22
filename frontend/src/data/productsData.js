@@ -1,0 +1,247 @@
+const categories = [
+  'Seeds',
+  'Fertilizers',
+  'Pesticides',
+  'Equipment',
+  'Tools',
+  'Irrigation',
+  'Vegetables',
+  'Fruits',
+]
+
+const units = {
+  Seeds: 'pack',
+  Fertilizers: 'bag',
+  Pesticides: 'bottle',
+  Equipment: 'piece',
+  Tools: 'set',
+  Irrigation: 'set',
+  Vegetables: 'kg',
+  Fruits: 'kg',
+}
+
+const categoryProducts = {
+  Seeds: [
+    'Hybrid Tomato Seeds',
+    'Premium Paddy Seeds',
+    'Wheat Seeds',
+    'Mustard Seeds',
+    'Sunflower Seeds',
+    'Corn Seeds',
+    'Cabbage Seeds',
+    'Onion Seeds',
+    'Chili Seeds',
+    'Okra Seeds',
+  ],
+  Fertilizers: [
+    'Urea Fertilizer',
+    'Organic Compost',
+    'NPK Fertilizer',
+    'Vermicompost',
+    'DAP Fertilizer',
+    'Micronutrient Mix',
+    'Potash Booster',
+    'Soil Enricher',
+    'Bio Fertilizer',
+    'Growth Booster',
+  ],
+  Pesticides: [
+    'Neem Bio Pesticide',
+    'Insect Killer Spray',
+    'Fungicide Liquid',
+    'Plant Protector',
+    'Organic Pest Control',
+    'Crop Shield',
+    'Leaf Protection Spray',
+    'Weed Control Liquid',
+    'Natural Insect Repellent',
+    'Bio Crop Guard',
+  ],
+  Equipment: [
+    'Mini Power Sprayer',
+    'Farm Water Pump',
+    'Soil Testing Kit',
+    'Hand Seeder Machine',
+    'Battery Sprayer',
+    'Crop Cutter',
+    'Grain Storage Bin',
+    'Agriculture Trolley',
+    'Power Weeder',
+    'Portable Harvester',
+  ],
+  Tools: [
+    'Garden Tool Set',
+    'Pruning Shear',
+    'Hand Cultivator',
+    'Digging Spade',
+    'Farm Sickle',
+    'Heavy Duty Hoe',
+    'Shovel Set',
+    'Planting Tool Kit',
+    'Rake Tool',
+    'Hand Fork',
+  ],
+  Irrigation: [
+    'Drip Irrigation Kit',
+    'Water Pipe Set',
+    'Sprinkler Set',
+    'Micro Drip Line',
+    'Irrigation Valve Pack',
+    'Water Connector Kit',
+    'Farm Spray Hose',
+    'Pressure Regulator',
+    'Water Timer Kit',
+    'Field Irrigation Pack',
+  ],
+  Vegetables: [
+    'Fresh Tomatoes',
+    'Organic Potatoes',
+    'Green Spinach',
+    'Farm Carrots',
+    'Fresh Cabbage',
+    'Green Peas',
+    'Brinjal Fresh',
+    'Cauliflower',
+    'Green Chili',
+    'Lady Finger',
+  ],
+  Fruits: [
+    'Sweet Mangoes',
+    'Red Apples',
+    'Fresh Bananas',
+    'Juicy Oranges',
+    'Farm Papaya',
+    'Fresh Guava',
+    'Pineapple',
+    'Pomegranate',
+    'Watermelon',
+    'Grapes',
+  ],
+}
+
+const categoryImages = {
+  Seeds: [
+    'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=800&q=80',
+    'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80',
+    'https://images.unsplash.com/photo-1471193945509-9ad0617afabf?w=800&q=80',
+    'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=800&q=80',
+    'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=800&q=80',
+    'https://images.unsplash.com/photo-1622383563227-04401ab4e5ea?w=800&q=80',
+    'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=800&q=80',
+    'https://images.unsplash.com/photo-1492496913980-501348b61469?w=800&q=80',
+    'https://images.unsplash.com/photo-1463123081488-789f998ac9c4?w=800&q=80',
+    'https://images.unsplash.com/photo-1502740479091-635887520276?w=800&q=80',
+  ],
+  Fertilizers: [
+    'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&q=80',
+    'https://images.unsplash.com/photo-1585250493649-06b2db164939?w=800&q=80',
+    'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=800&q=80',
+    'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=800&q=80',
+    'https://images.unsplash.com/photo-1471193945509-9ad0617afabf?w=800&q=80',
+    'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=800&q=80',
+    'https://images.unsplash.com/photo-1492496913980-501348b61469?w=800&q=80',
+    'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80',
+    'https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=800&q=80',
+    'https://images.unsplash.com/photo-1416879598555-22bcdf4bb0bd?w=800&q=80',
+  ],
+  Pesticides: [
+    'https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=800&q=80',
+    'https://images.unsplash.com/photo-1615486511484-90ab18d227b3?w=800&q=80',
+    'https://images.unsplash.com/photo-1502740479091-635887520276?w=800&q=80',
+    'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=800&q=80',
+    'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=800&q=80',
+    'https://images.unsplash.com/photo-1492496913980-501348b61469?w=800&q=80',
+    'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=800&q=80',
+    'https://images.unsplash.com/photo-1463123081488-789f998ac9c4?w=800&q=80',
+    'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=800&q=80',
+    'https://images.unsplash.com/photo-1471193945509-9ad0617afabf?w=800&q=80',
+  ],
+  Equipment: [
+    'https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=800&q=80',
+    'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=800&q=80',
+    'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=800&q=80',
+    'https://images.unsplash.com/photo-1471193945509-9ad0617afabf?w=800&q=80',
+    'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80',
+    'https://images.unsplash.com/photo-1492496913980-501348b61469?w=800&q=80',
+    'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=800&q=80',
+    'https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=800&q=80',
+    'https://images.unsplash.com/photo-1463123081488-789f998ac9c4?w=800&q=80',
+    'https://images.unsplash.com/photo-1416879598555-22bcdf4bb0bd?w=800&q=80',
+  ],
+  Tools: [
+    'https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=800&q=80',
+    'https://images.unsplash.com/photo-1416879598555-22bcdf4bb0bd?w=800&q=80',
+    'https://images.unsplash.com/photo-1463123081488-789f998ac9c4?w=800&q=80',
+    'https://images.unsplash.com/photo-1502740479091-635887520276?w=800&q=80',
+    'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=800&q=80',
+    'https://images.unsplash.com/photo-1492496913980-501348b61469?w=800&q=80',
+    'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=800&q=80',
+    'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=800&q=80',
+    'https://images.unsplash.com/photo-1471193945509-9ad0617afabf?w=800&q=80',
+    'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=800&q=80',
+  ],
+  Irrigation: [
+    'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=800&q=80',
+    'https://images.unsplash.com/photo-1471193945509-9ad0617afabf?w=800&q=80',
+    'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80',
+    'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=800&q=80',
+    'https://images.unsplash.com/photo-1492496913980-501348b61469?w=800&q=80',
+    'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=800&q=80',
+    'https://images.unsplash.com/photo-1463123081488-789f998ac9c4?w=800&q=80',
+    'https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=800&q=80',
+    'https://images.unsplash.com/photo-1416879598555-22bcdf4bb0bd?w=800&q=80',
+    'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=800&q=80',
+  ],
+  Vegetables: [
+    'https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=800&q=80',
+    'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=800&q=80',
+    'https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=800&q=80',
+    'https://images.unsplash.com/photo-1603048719539-9ecb4bce9f39?w=800&q=80',
+    'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=800&q=80',
+    'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=800&q=80',
+    'https://images.unsplash.com/photo-1471193945509-9ad0617afabf?w=800&q=80',
+    'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80',
+    'https://images.unsplash.com/photo-1492496913980-501348b61469?w=800&q=80',
+    'https://images.unsplash.com/photo-1502740479091-635887520276?w=800&q=80',
+  ],
+  Fruits: [
+    'https://images.unsplash.com/photo-1553279768-865429fa0078?w=800&q=80',
+    'https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=800&q=80',
+    'https://images.unsplash.com/photo-1574226516831-e1dff420e12b?w=800&q=80',
+    'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=800&q=80',
+    'https://images.unsplash.com/photo-1502741338009-cac2772e18bc?w=800&q=80',
+    'https://images.unsplash.com/photo-1492496913980-501348b61469?w=800&q=80',
+    'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80',
+    'https://images.unsplash.com/photo-1471193945509-9ad0617afabf?w=800&q=80',
+    'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=800&q=80',
+    'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=800&q=80',
+  ],
+}
+
+function createProducts() {
+  const products = []
+  let id = 1
+
+  categories.forEach((category) => {
+    const names = categoryProducts[category]
+    const images = categoryImages[category]
+
+    for (let i = 0; i < 25; i += 1) {
+      products.push({
+        id,
+        name: `${names[i % names.length]} ${i + 1}`,
+        category,
+        price: 100 + ((i * 73 + id * 19) % 4900),
+        image: images[i % images.length],
+        unit: units[category],
+        stock: 5 + ((i * 7 + id * 3) % 95),
+      })
+      id += 1
+    }
+  })
+
+  return products
+}
+
+export const PRODUCTS = createProducts()
+export const CATEGORIES = ['All', ...categories]

@@ -1,0 +1,11 @@
+
+> backend@1.0.0 start
+> node src/server.js
+
+✅ Server running on 5000
+MongoDB Connected: 127.0.0.1
+[0mGET /health [32m200[0m 9.083 ms - 106[0m
+[0mGET /health [32m200[0m 0.602 ms - 106[0m
+[0mGET /health [32m200[0m 0.505 ms - 107[0m
+[0mGET /favicon.ico [33m404[0m 9.040 ms - 67[0m
+[0mPOST /api/auth/register [33m400[0m 359.722 ms - 26[0m

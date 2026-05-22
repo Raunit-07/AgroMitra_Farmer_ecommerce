@@ -1,0 +1,331 @@
+/* ModernSellerDashboard.css */
+.msd-root {
+  display: flex;
+  min-height: 100vh;
+  background: #f8fafc;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Sidebar */
+.msd-sidebar {
+  width: 280px;
+  background: white;
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  height: 100vh;
+  z-index: 100;
+  transition: all 0.3s ease;
+}
+
+.msd-logo {
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.msd-logo-icon {
+  font-size: 28px;
+  background: #dcfce7;
+  padding: 8px;
+  border-radius: 12px;
+}
+
+.msd-logo-text {
+  font-size: 22px;
+  font-weight: 800;
+  color: #15803d;
+}
+
+.msd-nav {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.msd-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  color: #64748b;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+
+.msd-nav-item:hover {
+  background: #f1f5f9;
+  color: #15803d;
+}
+
+.msd-nav-item.active {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+/* Main Content */
+.msd-main {
+  flex: 1;
+  margin-left: 280px;
+  padding: 40px;
+}
+
+.msd-content-header {
+  margin-bottom: 32px;
+}
+
+.msd-content-header h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+/* Cards & Components */
+.msd-card {
+  background: white;
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+  border: 1px solid #e2e8f0;
+}
+
+/* Form Styles */
+.msd-form {
+  display: grid;
+  gap: 24px;
+}
+
+.msd-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.msd-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.msd-field label {
+  font-weight: 700;
+  color: #334155;
+  font-size: 14px;
+}
+
+.msd-field input, 
+.msd-field textarea,
+.msd-field select {
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.msd-field input:focus, 
+.msd-field textarea:focus {
+  border-color: #16a34a;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
+}
+
+/* Image Upload Zone */
+.msd-upload-zone {
+  border: 2px dashed #cbd5e1;
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  cursor: pointer;
+  background: #f8fafc;
+  transition: all 0.2s;
+}
+
+.msd-upload-zone:hover {
+  border-color: #16a34a;
+  background: #f0fdf4;
+}
+
+.msd-preview-img {
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 12px;
+  margin-top: 16px;
+}
+
+/* Buttons */
+.msd-btn-primary {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  color: white;
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.msd-btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.msd-btn-danger {
+  background: #fee2e2;
+  color: #dc2626;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+/* Grid Layouts */
+.msd-product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.msd-product-card {
+  background: white;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  transition: 0.3s;
+}
+
+.msd-product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.05);
+}
+
+.msd-product-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.msd-product-info {
+  padding: 20px;
+}
+
+.msd-product-info h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.msd-product-price {
+  color: #16a34a;
+  font-weight: 800;
+  font-size: 20px;
+}
+
+/* Status Messages */
+.msd-status {
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.msd-status.success { background: #dcfce7; color: #166534; }
+.msd-status.error { background: #fee2e2; color: #991b1b; }
+
+/* Table Styles */
+.msd-table-container {
+  overflow-x: auto;
+}
+
+.msd-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.msd-table th {
+  text-align: left;
+  padding: 16px;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.msd-table td {
+  padding: 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.msd-demand-intro {
+  margin-bottom: 20px;
+}
+
+.msd-demand-intro h2 {
+  margin: 0 0 8px;
+  color: #0f172a;
+  font-size: 20px;
+}
+
+.msd-demand-intro p {
+  margin: 0;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.msd-table-input {
+  width: 110px;
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+}
+
+.msd-badge {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.msd-badge.pending { background: #fef9c3; color: #854d0e; }
+.msd-badge.delivered { background: #dcfce7; color: #166534; }
+
+/* Loading Spinner */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .msd-sidebar { width: 80px; }
+  .msd-sidebar .msd-nav-item span { display: none; }
+  .msd-logo-text { display: none; }
+  .msd-main { margin-left: 80px; }
+}
+
+@media (max-width: 640px) {
+  .msd-main { padding: 20px; }
+  .msd-form-row { grid-template-columns: 1fr; }
+}
