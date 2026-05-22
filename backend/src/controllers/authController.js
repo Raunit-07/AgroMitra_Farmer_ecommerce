@@ -5,6 +5,7 @@ import { OAuth2Client } from "google-auth-library";
 import { generateToken } from "../utils/generateToken.js";
 import User from "../models/User.js";
 import { sendMail } from "../config/mailer.js";
+import { sendRegistrationNotification } from "../utils/sendEmail.js";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -110,6 +111,14 @@ export const registerUser = async (req, res) => {
     });
 
     const token = generateToken(user);
+
+    sendRegistrationNotification({
+      email: normalizedEmail,
+      name: userName,
+      role: assignedRole,
+    }).catch((emailError) => {
+      console.error("Registration notification email failed:", emailError.message);
+    });
 
     return res.status(201).json({
       message: "Registration successful",

@@ -15,6 +15,7 @@ const extractEmailAddress = (value = "") => {
 
 const getBrevoApiKey = () => getEnv("BREVO_API_KEY", "SENDINBLUE_API_KEY");
 const getResendApiKey = () => getEnv("RESEND_API_KEY");
+const getSendGridApiKey = () => getEnv("SENDGRID_API_KEY");
 
 const buildOtpEmail = (otp) => ({
   subject: "AgroMitra OTP Verification",
@@ -92,7 +93,50 @@ const sendViaBrevo = async ({ to, subject, html, text }) => {
   return data;
 };
 
-const sendTransactionalEmail = async (payload) => {
+const sendViaSendGrid = async ({ to, subject, html, text }) => {
+  const senderEmail = extractEmailAddress(
+    getEnv("SENDGRID_FROM_EMAIL", "EMAIL_FROM", "SMTP_FROM", "SMTP_USER")
+  );
+  const senderName = getEnv("SENDGRID_FROM_NAME", "EMAIL_FROM_NAME") || "AgroMitra";
+
+  if (!senderEmail) {
+    throw new Error("SendGrid sender email is missing. Set SENDGRID_FROM_EMAIL or EMAIL_FROM.");
+  }
+
+  const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${getSendGridApiKey()}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      personalizations: [{ to: [{ email: to }] }],
+      from: { email: senderEmail, name: senderName },
+      subject,
+      content: [
+        { type: "text/plain", value: text || "" },
+        { type: "text/html", value: html || text || "" },
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    const message =
+      data?.errors?.map((error) => error.message).join("; ") ||
+      data?.message ||
+      "SendGrid email API failed";
+    throw new Error(message);
+  }
+
+  return { id: response.headers.get("x-message-id") || "sendgrid-success" };
+};
+
+export const sendTransactionalEmail = async (payload) => {
+  if (getSendGridApiKey()) {
+    return sendViaSendGrid(payload);
+  }
+
   if (getResendApiKey()) {
     return sendViaResend(payload);
   }
@@ -108,6 +152,26 @@ const sendTransactionalEmail = async (payload) => {
   }
 
   return sendMail(payload);
+};
+
+export const sendRegistrationNotification = async ({ email, name, role }) => {
+  const displayName = name || "AgroMitra user";
+  const displayRole = role === "farmer" || role === "seller" ? "seller" : "buyer";
+
+  return sendTransactionalEmail({
+    to: email,
+    subject: "Welcome to AgroMitra",
+    text: `Hi ${displayName}, your AgroMitra ${displayRole} account has been created successfully.`,
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111827;">
+        <h2 style="color: #15803d;">Welcome to AgroMitra</h2>
+        <p>Hi ${displayName},</p>
+        <p>Your AgroMitra ${displayRole} account has been created successfully.</p>
+        <p>You can now login and continue your farming marketplace journey.</p>
+        <p style="color: #64748b;">If you did not create this account, please contact AgroMitra support.</p>
+      </div>
+    `,
+  });
 };
 
 export const sendEmail = async (email, otp) => {

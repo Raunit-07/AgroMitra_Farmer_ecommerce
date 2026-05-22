@@ -728,7 +728,7 @@
 
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { sendRegisterOtp, verifyRegisterOtp } from "../services/registerOtpService";
+import { db } from "../lib/mongoClient";
 import { validateEmail, normalizeEmail } from "../utils/authUtils";
 import { useLanguage } from "../context/LanguageContext";
 import "../components/landing.css";
@@ -739,9 +739,6 @@ const GST_REGEX =
 export default function Register() {
   const navigate = useNavigate();
   const { t } = useLanguage();
-
-  const [step, setStep] = useState("register");
-  const [otp, setOtp] = useState("");
 
   const [formData, setFormData] = useState({
     full_name: "",
@@ -806,55 +803,35 @@ export default function Register() {
     try {
       const normalizedEmail = normalizeEmail(formData.email);
 
-      await sendRegisterOtp({ email: normalizedEmail });
-
-      setSuccess(`OTP sent to ${normalizedEmail}. Please check your email.`);
-      setStep("otp");
-    } catch (err) {
-      setError(err.message || "OTP send failed");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleOtpSubmit(e) {
-    e.preventDefault();
-
-    if (!/^\d{6}$/.test(otp)) {
-      setError("Please enter valid 6 digit OTP");
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-    setSuccess("");
-
-    try {
-      const normalizedEmail = normalizeEmail(formData.email);
-
       const backendRole = formData.role === "seller" ? "farmer" : "buyer";
 
-      await verifyRegisterOtp({
+      const { error: registerError } = await db.auth.register({
         full_name: formData.full_name.trim(),
         name: formData.full_name.trim(),
         email: normalizedEmail,
         phone: formData.phone.trim(),
         password: formData.password,
         role: backendRole,
-        otp,
         gst_number:
           formData.role === "seller"
             ? formData.gst_number.trim().toUpperCase()
             : null,
       });
 
-      setSuccess("OTP verified. Registration successful.");
+      if (registerError) {
+        throw registerError;
+      }
+
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      setSuccess("Registration successful. Confirmation email has been sent.");
 
       setTimeout(() => {
         navigate(formData.role === "seller" ? "/seller-login" : "/buyer-login");
       }, 1000);
     } catch (err) {
-      setError(err.message || "OTP verification failed");
+      setError(err.message || "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -897,22 +874,15 @@ export default function Register() {
           <div className="register-card">
             <div className="register-top">
               <div className="register-icon">✨</div>
-              <span className="register-small-badge">
-                {step === "register" ? "Create Account" : "Verify Email"}
-              </span>
-              <h2>{step === "register" ? "Register" : "Verify OTP"}</h2>
-              <p>
-                {step === "register"
-                  ? "Create your AgroMitra account and continue your journey."
-                  : `Enter OTP sent to ${normalizeEmail(formData.email)}`}
-              </p>
+              <span className="register-small-badge">Create Account</span>
+              <h2>Register</h2>
+              <p>Create your AgroMitra account and continue your journey.</p>
             </div>
 
             {error && <div className="register-error">{error}</div>}
             {success && <div className="register-success">{success}</div>}
 
-            {step === "register" ? (
-              <form onSubmit={handleInitialSubmit} className="register-form">
+            <form onSubmit={handleInitialSubmit} className="register-form">
                 <div className="register-form-group">
                   <label>Full Name</label>
                   <input
@@ -1009,54 +979,9 @@ export default function Register() {
                 )}
 
                 <button type="submit" className="register-btn-main" disabled={loading}>
-                  {loading ? "Sending OTP..." : "Create Account"}
+                  {loading ? "Creating account..." : "Create Account"}
                 </button>
               </form>
-            ) : (
-              <form onSubmit={handleOtpSubmit} className="register-form">
-                <div className="register-form-group">
-                  <label>Enter OTP</label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    placeholder="Enter 6 digit OTP"
-                    className="register-otp-input"
-                    value={otp}
-                    onChange={(e) =>
-                      setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
-                    }
-                    required
-                  />
-                </div>
-
-                <button type="submit" className="register-btn-main" disabled={loading}>
-                  {loading ? "Verifying..." : "Verify OTP & Register"}
-                </button>
-
-                <button
-                  type="button"
-                  disabled={loading}
-                  className="register-btn-secondary"
-                  onClick={handleInitialSubmit}
-                >
-                  Resend OTP
-                </button>
-
-                <button
-                  type="button"
-                  disabled={loading}
-                  className="register-btn-secondary"
-                  onClick={() => {
-                    setStep("register");
-                    setOtp("");
-                    setError("");
-                    setSuccess("");
-                  }}
-                >
-                  Edit details
-                </button>
-              </form>
-            )}
 
             <div className="register-bottom">
               <p>
