@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { db } from '../lib/mongoClient';
 import { useLanguage } from '../context/LanguageContext';
+import CollectiveBuyModal from '../components/CollectiveBuyModal';
 import '../components/landing.css';
 
 const escapeSvgText = (value = '') =>
@@ -29,11 +30,11 @@ const getProductFallbackImage = (name = 'Product') => {
 
 export default function ProductDetail() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const { t } = useLanguage();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
+  const [showCollectiveModal, setShowCollectiveModal] = useState(false);
 
   useEffect(() => {
     fetchProduct();
@@ -184,7 +185,7 @@ export default function ProductDetail() {
             </button>
             <button
               type="button"
-              onClick={() => navigate('/collective-buying')}
+              onClick={() => setShowCollectiveModal(true)}
               style={{
                 marginTop: '12px',
                 background: '#f59e0b',
@@ -197,11 +198,20 @@ export default function ProductDetail() {
                 cursor: 'pointer'
               }}
             >
-              {t('product.joinCollective')}
+              Collective Buy
             </button>
+            <p style={{ marginTop: '8px', color: '#92400e', fontWeight: 700 }}>
+              Buy Together & Save Up To 25%
+            </p>
           </div>
         </div>
       </div>
+      {showCollectiveModal && (
+        <CollectiveBuyModal
+          product={product}
+          onClose={() => setShowCollectiveModal(false)}
+        />
+      )}
     </section>
   );
 }

@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { db } from '../lib/mongoClient'
 import { useLanguage } from '../context/LanguageContext'
+import NotificationBell from './NotificationBell.jsx'
 import './landing.css'
 
 export default function Navbar() {
@@ -155,6 +156,8 @@ export default function Navbar() {
             <option value="hi">हिंदी</option>
           </select>
 
+          {user && isBuyer && <NotificationBell />}
+
           {!user ? (
             <>
               <Link to="/buyer-login" className="premium-login-btn">
@@ -285,6 +288,12 @@ export default function Navbar() {
             <option value="en">English</option>
             <option value="hi">हिंदी</option>
           </select>
+
+          {user && isBuyer && (
+            <Link onClick={() => setMenuOpen(false)} to="/notifications">
+              🔔 Notifications
+            </Link>
+          )}
 
           {!user ? (
             <>

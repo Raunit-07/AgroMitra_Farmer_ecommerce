@@ -16,6 +16,8 @@ import Cart from './pages/Cart.jsx'
 import Checkout from './pages/Checkout.jsx'
 import CategoryProducts from './pages/CategoryProducts.jsx'
 import CollectiveBuying from './pages/CollectiveBuying.jsx'
+import CollectiveSession from './pages/CollectiveSession.jsx'
+import Notifications from './pages/Notifications.jsx'
 import Payment from './pages/Payment.jsx'
 import Addresses from './pages/Addresses.jsx'
 import MyOrders from './pages/MyOrders.jsx'
@@ -63,6 +65,11 @@ function App() {
               <CollectiveBuying />
             </ProtectedRoute>
           } />
+          <Route path="/collective/session/:id" element={
+            <ProtectedRoute requiredRole="buyer" redirectTo="/seller-dashboard">
+              <CollectiveSession />
+            </ProtectedRoute>
+          } />
 
           {/* Buyer-Only Protected Routes */}
           <Route path="/cart" element={
@@ -108,6 +115,11 @@ function App() {
           <Route path="/order-tracking" element={
             <ProtectedRoute requiredRole="buyer" redirectTo="/seller-dashboard">
               <OrderTracking />
+            </ProtectedRoute>
+          } />
+          <Route path="/notifications" element={
+            <ProtectedRoute requiredRole="buyer" redirectTo="/seller-dashboard">
+              <Notifications />
             </ProtectedRoute>
           } />
 
