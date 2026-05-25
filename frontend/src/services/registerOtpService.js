@@ -93,7 +93,7 @@ const parseResponse = async (res, fallbackMessage) => {
   return data;
 };
 
-export const sendRegisterOtp = async ({ email }) => {
+export const sendRegisterOtp = async ({ email, role = "buyer" }) => {
   if (!rawApiBaseUrl) {
     throw new Error("Backend API URL is not configured");
   }
@@ -107,7 +107,7 @@ export const sendRegisterOtp = async ({ email }) => {
   const res = await fetch(`${API_BASE_URL}/auth/otp/register/send-otp`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email: normalizedEmail }),
+    body: JSON.stringify({ email: normalizedEmail, role }),
   });
 
   return parseResponse(res, "OTP send failed");

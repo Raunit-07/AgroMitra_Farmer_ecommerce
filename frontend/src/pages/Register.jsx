@@ -730,7 +730,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { db } from "../lib/mongoClient";
 import { validateEmail, normalizeEmail } from "../utils/authUtils";
-import { useLanguage } from "../context/LanguageContext";
 import "../components/landing.css";
 
 const GST_REGEX =
@@ -738,7 +737,6 @@ const GST_REGEX =
 
 export default function Register() {
   const navigate = useNavigate();
-  const { t } = useLanguage();
 
   const [formData, setFormData] = useState({
     full_name: "",
@@ -753,10 +751,6 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
-  function safeText(key, fallback) {
-    return t(key) || fallback;
-  }
 
   function handleChange(event) {
     const { name, value } = event.target;

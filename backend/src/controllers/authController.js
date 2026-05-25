@@ -90,12 +90,12 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ message: errorMsg });
     }
 
-    const existingUser = await User.findOne({ email: normalizedEmail });
+    const assignedRole = normalizeRole(role);
+    const existingUser = await User.findOne({ email: normalizedEmail, role: assignedRole });
     if (existingUser) {
-      return res.status(400).json({ message: "Email already registered" });
+      return res.status(400).json({ message: `Email already registered as ${assignedRole === "farmer" ? "seller" : assignedRole}` });
     }
 
-    const assignedRole = normalizeRole(role);
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({
       name: userName,
@@ -128,6 +128,9 @@ export const registerUser = async (req, res) => {
     });
   } catch (error) {
     console.error("Registration error:", error);
+    if (error?.code === 11000) {
+      return res.status(400).json({ message: "Email already registered for this role" });
+    }
     return res.status(500).json({ message: error.message });
   }
 };
@@ -140,13 +143,23 @@ export const registerSeller = async (req, res) => {
 export const loginUser = async (req, res) => {
   try {
     const normalizedEmail = req.body.email?.trim().toLowerCase();
-    const { password } = req.body;
+    const { password, role } = req.body;
 
     if (!normalizedEmail || !password) {
       return res.status(400).json({ message: "Email and password are required" });
     }
 
-    const user = await User.findOne({ email: normalizedEmail });
+    const normalizedRole = role ? normalizeRole(role) : null;
+    const query = normalizedRole
+      ? { email: normalizedEmail, role: normalizedRole }
+      : { email: normalizedEmail };
+    const users = await User.find(query);
+    const user = users[0];
+
+    if (!normalizedRole && users.length > 1) {
+      return res.status(400).json({ message: "Please login from Buyer Login or Seller Login for this email" });
+    }
+
     if (!user || !user.password) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
@@ -192,7 +205,7 @@ export const googleLogin = async (req, res) => {
     const payload = ticket.getPayload();
     const normalizedEmail = payload.email.trim().toLowerCase();
 
-    let user = await User.findOne({ email: normalizedEmail });
+    let user = await User.findOne({ email: normalizedEmail, role: "buyer" });
     if (!user) {
       user = await User.create({
         name: payload.name,

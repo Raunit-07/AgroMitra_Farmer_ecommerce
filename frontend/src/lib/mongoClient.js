@@ -147,11 +147,11 @@ class QueryBuilder {
 
 export const db = {
   auth: {
-    async loginWithPassword({ email, password }) {
+    async loginWithPassword({ email, password, role }) {
       try {
         const payload = await request("/auth/login", {
           method: "POST",
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({ email, password, role }),
         });
 
         const session = { access_token: payload.token };
@@ -198,7 +198,7 @@ export const db = {
         if (user) localStorage.setItem("user", JSON.stringify(user));
 
         return { data: { user }, error: null };
-      } catch (error) {
+      } catch {
         return { data: { user: getLocalUser() }, error: null };
       }
     },

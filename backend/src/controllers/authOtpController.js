@@ -16,14 +16,15 @@ function normalizeRole(role) {
 export async function sendRegisterOtp(req, res) {
   try {
     const normalizedEmail = req.body.email?.trim().toLowerCase();
+    const normalizedRole = normalizeRole(req.body.role);
 
     if (!normalizedEmail) {
       return res.status(400).json({ message: "Email is required" });
     }
 
-    const existingUser = await User.findOne({ email: normalizedEmail });
+    const existingUser = await User.findOne({ email: normalizedEmail, role: normalizedRole });
     if (existingUser) {
-      return res.status(400).json({ message: "Email already registered" });
+      return res.status(400).json({ message: `Email already registered as ${normalizedRole === "farmer" ? "seller" : normalizedRole}` });
     }
 
     const otp = generateOtp();
@@ -100,12 +101,12 @@ export async function verifyRegisterOtp(req, res) {
       return res.status(400).json({ message: "OTP expired" });
     }
 
-    const existingUser = await User.findOne({ email: normalizedEmail });
+    const finalRole = normalizeRole(role);
+    const existingUser = await User.findOne({ email: normalizedEmail, role: finalRole });
     if (existingUser) {
-      return res.status(400).json({ message: "Email already registered" });
+      return res.status(400).json({ message: `Email already registered as ${finalRole === "farmer" ? "seller" : finalRole}` });
     }
 
-    const finalRole = normalizeRole(role);
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({
       name: displayName,
@@ -130,6 +131,12 @@ export async function verifyRegisterOtp(req, res) {
     });
   } catch (error) {
     console.error("REGISTRATION FLOW ERROR:", error);
+    if (error?.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: "Email already registered for this role",
+      });
+    }
     return res.status(500).json({
       success: false,
       message: error.message || "Registration failed",

@@ -304,8 +304,12 @@ export const runDataOperation = async (req, res) => {
             userId: record.userId,
             productId: record.productId,
           };
+        } else if (record._id) {
+          lookup = { _id: record._id };
+        } else if (table === "profiles" && record.email && record.role) {
+          lookup = { email: record.email, role: record.role };
         } else {
-          lookup = record._id ? { _id: record._id } : { email: record.email };
+          lookup = { email: record.email };
         }
 
         const doc = await Model.findOneAndUpdate(lookup, record, {

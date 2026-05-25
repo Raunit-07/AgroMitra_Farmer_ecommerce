@@ -15,9 +15,6 @@ export default function BuyerLogin() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // Check for email validity for UI feedback
-  const isEmailValid = email ? validateEmail(email) : true;
-
   async function handleSubmit(event) {
     event.preventDefault();
     if (loading) return; // Prevent duplicate requests
@@ -36,6 +33,7 @@ export default function BuyerLogin() {
       const { data: authData, error: authError } = await db.auth.loginWithPassword({
         email: normalizedEmail,
         password,
+        role: 'buyer',
       });
 
       // Proper error message for invalid credentials
