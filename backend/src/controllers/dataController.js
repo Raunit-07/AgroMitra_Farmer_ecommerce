@@ -93,17 +93,16 @@ const normalizeRecord = (table, record = {}, req) => {
   delete next.id;
 
   if (table === "cart") {
-    next.userId = normalizeValue(
-      "user_id",
-      next.user_id || next.userId || req.user?.id,
-      table
-    );
+    const cartUserId = next.user_id || next.userId;
+    const cartProductId = next.product_id || next.productId;
 
-    next.productId = normalizeValue(
-      "product_id",
-      next.product_id || next.productId,
-      table
-    );
+    if (cartUserId || cartProductId) {
+      next.userId = normalizeValue("user_id", cartUserId || req.user?.id, table);
+    }
+
+    if (cartProductId) {
+      next.productId = normalizeValue("product_id", cartProductId, table);
+    }
 
     next.quantity = Math.max(1, Number(next.quantity || 1));
 
@@ -123,8 +122,12 @@ const normalizeRecord = (table, record = {}, req) => {
     if (!next.image && next.image_url) next.image = next.image_url;
     if (!next.image_url && next.image) next.image_url = next.image;
 
-    if (!next.stock && next.stock_quantity) next.stock = next.stock_quantity;
-    if (!next.stock_quantity && next.stock) next.stock_quantity = next.stock;
+    if (Object.prototype.hasOwnProperty.call(next, "stock") && !Object.prototype.hasOwnProperty.call(next, "stock_quantity")) {
+      next.stock_quantity = next.stock;
+    }
+    if (Object.prototype.hasOwnProperty.call(next, "stock_quantity") && !Object.prototype.hasOwnProperty.call(next, "stock")) {
+      next.stock = next.stock_quantity;
+    }
   }
 
   if (table === "profiles") {
@@ -244,6 +247,32 @@ export const runDataOperation = async (req, res) => {
           }
 
           const quantityToAdd = Math.max(1, Number(record.quantity || 1));
+          const product = await Product.findById(record.productId);
+
+          if (!product) {
+            return res.status(404).json({
+              data: null,
+              error: { message: "Product not found" },
+              message: "Product not found",
+            });
+          }
+
+          const existingCartItem = await Cart.findOne({
+            userId: record.userId,
+            productId: record.productId,
+          });
+          const nextQuantity = Number(existingCartItem?.quantity || 0) + quantityToAdd;
+          const availableStock = Number(product.stock ?? product.stock_quantity ?? 0);
+
+          if (nextQuantity > availableStock) {
+            return res.status(400).json({
+              data: null,
+              error: {
+                message: `Only ${availableStock} item${availableStock === 1 ? "" : "s"} available in stock`,
+              },
+              message: `Only ${availableStock} item${availableStock === 1 ? "" : "s"} available in stock`,
+            });
+          }
 
           const doc = await Cart.findOneAndUpdate(
             {
@@ -328,6 +357,38 @@ export const runDataOperation = async (req, res) => {
     }
 
     if (op === "update") {
+      if (table === "cart" && values && Object.prototype.hasOwnProperty.call(values, "quantity")) {
+        const nextQuantity = Number(values.quantity);
+
+        if (!Number.isFinite(nextQuantity) || nextQuantity < 1) {
+          return res.status(400).json({
+            data: null,
+            error: { message: "Invalid quantity" },
+            message: "Invalid quantity",
+          });
+        }
+
+        const cartDocs = await Cart.find(query).populate({
+          path: "productId",
+          model: "Product",
+        });
+
+        for (const cartDoc of cartDocs) {
+          const product = cartDoc.productId;
+          const availableStock = Number(product?.stock ?? product?.stock_quantity ?? 0);
+
+          if (!product || nextQuantity > availableStock) {
+            return res.status(400).json({
+              data: null,
+              error: {
+                message: `Only ${availableStock} item${availableStock === 1 ? "" : "s"} available in stock`,
+              },
+              message: `Only ${availableStock} item${availableStock === 1 ? "" : "s"} available in stock`,
+            });
+          }
+        }
+      }
+
       await Model.updateMany(query, normalizeRecord(table, values, req));
 
       const updated = await runPopulate(table, Model.find(query));

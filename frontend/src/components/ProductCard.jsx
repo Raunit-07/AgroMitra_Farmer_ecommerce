@@ -39,7 +39,10 @@ export default function ProductCard({ product }) {
 
   const unit = product?.unit || 'piece'
   const price = Number(product?.price || 0)
-  const stock = product?.stock || 0
+  const stock = Number(product?.stock ?? product?.stock_quantity ?? 0)
+  const ratingCount = Number(product?.rating_count || product?.reviews_count || 0)
+  const ratingAverage = Number(product?.rating_average || product?.rating || 0)
+  const hasRating = ratingCount > 0 && ratingAverage > 0
 
   async function handleAddToCart(e) {
     e.stopPropagation()
@@ -71,15 +74,27 @@ export default function ProductCard({ product }) {
       if (fetchError) throw fetchError
 
       if (existingItem) {
+        const nextQuantity = Number(existingItem.quantity || 0) + 1
+
+        if (nextQuantity > stock) {
+          alert(`Only ${stock} item${stock === 1 ? '' : 's'} available in stock`)
+          return
+        }
+
         const { error: updateError } = await db
           .from('cart')
           .update({
-            quantity: Number(existingItem.quantity || 0) + 1,
+            quantity: nextQuantity,
           })
           .eq('id', existingItem.id)
 
         if (updateError) throw updateError
       } else {
+        if (stock < 1) {
+          alert(t('productsPage.outOfStock'))
+          return
+        }
+
         const { error: insertError } = await db.from('cart').insert({
           user_id: user.id,
           product_id: product.id,
@@ -119,7 +134,7 @@ export default function ProductCard({ product }) {
           }}
         />
 
-        <button type="button" onClick={handleAddToCart} disabled={adding}>
+        <button type="button" onClick={handleAddToCart} disabled={adding || stock < 1}>
           {adding ? 'Adding...' : t('productsPage.addToCart') || 'ADD'}
         </button>
       </div>
@@ -129,10 +144,8 @@ export default function ProductCard({ product }) {
           <span>
             ₹{price} / {t(`common.units.${unit}`)}
           </span>
-          <del>₹{price + 100}</del>
         </div>
 
-        <p className="shop-off">₹50 {t('product.off')}</p>
 
         <h3>{product?.name}</h3>
 
@@ -142,7 +155,9 @@ export default function ProductCard({ product }) {
 
         <span className="shop-tag">{product?.category || 'Agriculture'}</span>
 
-        <p className="shop-rating">⭐ 4.8</p>
+        {hasRating && (
+          <p className="shop-rating">⭐ {ratingAverage.toFixed(1)} ({ratingCount})</p>
+        )}
       </div>
     </div>
   )

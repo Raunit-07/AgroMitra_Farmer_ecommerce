@@ -65,6 +65,13 @@ export default function ProductDetail() {
 
   async function handleAddToCart() {
     if (!product) return; // Cart Logic Fix
+    const availableStock = Number(product.stock ?? product.stock_quantity ?? 0);
+
+    if (availableStock < 1) {
+      alert(t('productsPage.outOfStock'));
+      return;
+    }
+
     setAdding(true);
 
     try {
@@ -84,9 +91,16 @@ export default function ProductDetail() {
         .maybeSingle();
 
       if (existingItem) {
+        const nextQuantity = Number(existingItem.quantity || 0) + 1;
+
+        if (nextQuantity > availableStock) {
+          alert(`Only ${availableStock} item${availableStock === 1 ? '' : 's'} available in stock`);
+          return;
+        }
+
         await db
           .from('cart')
-          .update({ quantity: existingItem.quantity + 1 })
+          .update({ quantity: nextQuantity })
           .eq('id', existingItem.id);
       } else {
         await db.from('cart').insert({
@@ -99,6 +113,7 @@ export default function ProductDetail() {
         });
       }
 
+      window.dispatchEvent(new Event('cartUpdated'));
       alert(t('product.added_cart'));
     } catch (error) {
       alert(error.message || t('product.add_failed'));
@@ -115,6 +130,7 @@ export default function ProductDetail() {
     product?.image ||
     product?.image_url ||
     getProductFallbackImage(product?.name);
+  const stock = Number(product.stock ?? product.stock_quantity ?? 0);
 
   return (
     <section className="products-page-pro">
@@ -139,7 +155,6 @@ export default function ProductDetail() {
             
             <div className="shop-price" style={{ fontSize: '24px', marginBottom: '20px' }}>
               <span>₹{product.price} / {t(`common.units.${product.unit || 'piece'}`)}</span>
-              <del style={{ fontSize: '16px', marginLeft: '10px' }}>₹{Number(product.price) + 100}</del>
             </div>
             
             <p style={{ color: '#4b5563', marginBottom: '25px', lineHeight: '1.6' }}>
@@ -147,12 +162,12 @@ export default function ProductDetail() {
             </p>
             
             <p className="shop-pack" style={{ marginBottom: '30px' }}>
-              {t('product.in_stock')}: {product.stock || 0}
+              {t('product.in_stock')}: {stock}
             </p>
             
             <button 
               onClick={handleAddToCart} 
-              disabled={adding}
+              disabled={adding || stock < 1}
               style={{ 
                 background: '#10b981', 
                 color: 'white', 
@@ -161,8 +176,8 @@ export default function ProductDetail() {
                 borderRadius: '6px', 
                 fontSize: '16px', 
                 fontWeight: 'bold',
-                cursor: adding ? 'not-allowed' : 'pointer',
-                opacity: adding ? 0.7 : 1
+                cursor: adding || stock < 1 ? 'not-allowed' : 'pointer',
+                opacity: adding || stock < 1 ? 0.7 : 1
               }}
             >
               {adding ? t('productsPage.loading') : t('productsPage.addToCart')}

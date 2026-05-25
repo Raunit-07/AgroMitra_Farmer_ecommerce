@@ -29,8 +29,17 @@ export const addToCart = async (req, res, next) => {
     }
 
     const existingItem = await Cart.findOne({ userId, productId });
+    const availableStock = Number(product.stock ?? product.stock_quantity ?? 0);
+    const nextQuantity = Number(existingItem?.quantity || 0) + qtyNum;
+
+    if (nextQuantity > availableStock) {
+      return res.status(400).json({
+        message: `Only ${availableStock} item${availableStock === 1 ? "" : "s"} available in stock`,
+      });
+    }
+
     if (existingItem) {
-      existingItem.quantity += qtyNum;
+      existingItem.quantity = nextQuantity;
       await existingItem.save();
     } else {
       await Cart.create({ userId, productId, quantity: qtyNum });

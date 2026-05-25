@@ -1,6 +1,7 @@
 import Cart from "../models/Cart.js";
 import Order from "../models/Order.js";
 import Address from "../models/Address.js";
+import Product from "../models/Product.js";
 
 const shapeOrder = (order) => {
   const obj = order.toObject ? order.toObject() : order;
@@ -20,6 +21,7 @@ export const placeOrder = async (req, res, next) => {
     }
 
     const orderItems = [];
+    const decrementedProducts = [];
     let totalAmount = 0;
 
     for (const item of cartItems) {
@@ -28,13 +30,22 @@ export const placeOrder = async (req, res, next) => {
         return res.status(400).json({ message: `Invalid product: ${item.productId}` });
       }
 
+      const quantity = Number(item.quantity || 1);
+      const availableStock = Number(product.stock ?? product.stock_quantity ?? 0);
+
+      if (quantity > availableStock) {
+        return res.status(400).json({
+          message: `${product.name || product.title} has only ${availableStock} item${availableStock === 1 ? "" : "s"} in stock`,
+        });
+      }
+
       const price = Number(product.price || 0);
-      totalAmount += price * item.quantity;
+      totalAmount += price * quantity;
       orderItems.push({
         product_id: product.id,
         product_name: product.name || product.title,
         price,
-        quantity: item.quantity,
+        quantity,
       });
     }
 
@@ -43,7 +54,54 @@ export const placeOrder = async (req, res, next) => {
       address = await Address.findOne({ _id: req.body.address_id, user_id: userId });
     }
 
-    const order = await Order.create({
+    for (const item of orderItems) {
+      const cartProduct = cartItems.find(
+        (cartItem) => String(cartItem.productId?._id || cartItem.productId?.id) === String(item.product_id)
+      )?.productId;
+      const syncedStock = Number(cartProduct?.stock ?? cartProduct?.stock_quantity ?? 0);
+
+      if (Number(cartProduct?.stock_quantity ?? 0) !== syncedStock) {
+        await Product.findByIdAndUpdate(item.product_id, {
+          $set: { stock_quantity: syncedStock },
+        });
+      }
+
+      const updatedProduct = await Product.findOneAndUpdate(
+        {
+          _id: item.product_id,
+          stock: { $gte: item.quantity },
+          stock_quantity: { $gte: item.quantity },
+        },
+        {
+          $inc: {
+            stock: -item.quantity,
+            stock_quantity: -item.quantity,
+          },
+        },
+        { new: true }
+      );
+
+      if (!updatedProduct) {
+        for (const decremented of decrementedProducts) {
+          await Product.findByIdAndUpdate(decremented.productId, {
+            $inc: {
+              stock: decremented.quantity,
+              stock_quantity: decremented.quantity,
+            },
+          });
+        }
+
+        return res.status(400).json({
+          message: `${item.product_name} stock changed. Please update your cart and try again.`,
+        });
+      }
+
+      decrementedProducts.push({ productId: item.product_id, quantity: item.quantity });
+    }
+
+    let order;
+    try {
+      order = await Order.create({
       userId,
       user_id: userId,
       buyer_id: userId,
@@ -57,7 +115,19 @@ export const placeOrder = async (req, res, next) => {
       payment_status: "pending",
       address_id: req.body.address_id || null,
       address: address ? address.toObject() : req.body.address || null,
-    });
+      });
+    } catch (error) {
+      for (const decremented of decrementedProducts) {
+        await Product.findByIdAndUpdate(decremented.productId, {
+          $inc: {
+            stock: decremented.quantity,
+            stock_quantity: decremented.quantity,
+          },
+        });
+      }
+
+      throw error;
+    }
 
     await Cart.deleteMany({ userId });
 

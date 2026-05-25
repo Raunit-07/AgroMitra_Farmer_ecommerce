@@ -14,6 +14,8 @@ const productSchema = new mongoose.Schema(
     unit: { type: String, default: "kg" },
     stock: { type: Number, default: 0 },
     stock_quantity: { type: Number, default: 0 },
+    rating_average: { type: Number, default: 0 },
+    rating_count: { type: Number, default: 0 },
     min_order_quantity: { type: Number, default: 1 },
     sellerId: String,
     farmer_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
@@ -35,8 +37,12 @@ productSchema.pre("save", function (next) {
   if (!this.title) this.title = this.name;
   if (!this.image && this.image_url) this.image = this.image_url;
   if (!this.image_url && this.image) this.image_url = this.image;
-  if (!this.stock && this.stock_quantity) this.stock = this.stock_quantity;
-  if (!this.stock_quantity && this.stock) this.stock_quantity = this.stock;
+  if (this.isModified("stock") && !this.isModified("stock_quantity")) {
+    this.stock_quantity = this.stock;
+  }
+  if (this.isModified("stock_quantity") && !this.isModified("stock")) {
+    this.stock = this.stock_quantity;
+  }
   next();
 });
 

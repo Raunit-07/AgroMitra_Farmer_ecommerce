@@ -37,6 +37,10 @@ export default function Checkout() {
     const product = getCartProduct(item)
     return item.product_id || product.id || product._id || item.productId
   }
+  const getProductStock = (item) => {
+    const product = getCartProduct(item)
+    return Number(product.stock ?? product.stock_quantity ?? 0)
+  }
 
   useEffect(() => {
     init()
@@ -111,8 +115,7 @@ export default function Checkout() {
   const deliveryFee = subtotal > 0 ? 49 : 0
   const grandTotal = subtotal + deliveryFee
 
-  // Flattened cart usually doesn't have stock info, we proceed with cart quantity
-  const stockWarnings = []
+  const stockWarnings = items.filter((item) => Number(item.quantity || 1) > getProductStock(item))
 
   function handleContinue() {
     if (!address) {
@@ -173,12 +176,16 @@ export default function Checkout() {
                   const name = getProductName(item)
                   const price = getProductPrice(item)
                   const quantity = Number(item.quantity || 1)
+                  const stock = getProductStock(item)
 
                   return (
                     <div className="checkout-item" key={item.id}>
                       <img src={image} alt={name} className="checkout-item-img" />
                       <div className="checkout-item-info">
                         <strong>{name}</strong>
+                        <small className="checkout-stock-warn">
+                          {t('product.in_stock')}: {stock}
+                        </small>
                         <span>
                           ₹{price} × {quantity}
                         </span>

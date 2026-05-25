@@ -83,6 +83,11 @@ export default function Cart() {
     );
   };
 
+  const getProductStock = (item) => {
+    const product = getCartProduct(item);
+    return Number(product.stock ?? product.stock_quantity ?? 0);
+  };
+
   async function fetchCart() {
     setLoading(true);
     setMessage("");
@@ -182,6 +187,7 @@ export default function Cart() {
                 const cartId = getItemId(item);
                 const quantity = Number(item.quantity || 1);
                 const price = getProductPrice(item);
+                const stock = getProductStock(item);
                 const subtotal = price * quantity;
 
                 return (
@@ -197,6 +203,10 @@ export default function Cart() {
                         <span>/ {t("product.unit").toLowerCase()}</span>
                       </div>
 
+                      <p className="checkout-stock-warn">
+                        {t("product.in_stock")}: {stock}
+                      </p>
+
                       <div className="cart-quantity-row">
                         <button onClick={() => updateQuantity(cartId, quantity, "dec")}>
                           −
@@ -204,7 +214,10 @@ export default function Cart() {
 
                         <span>{quantity}</span>
 
-                        <button onClick={() => updateQuantity(cartId, quantity, "inc")}>
+                        <button
+                          onClick={() => updateQuantity(cartId, quantity, "inc")}
+                          disabled={quantity >= stock}
+                        >
                           +
                         </button>
                       </div>

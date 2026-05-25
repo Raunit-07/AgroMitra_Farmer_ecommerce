@@ -18,7 +18,7 @@ const ModernSellerDashboard = () => {
   const [status, setStatus] = useState({ type: "", message: "" });
 
   // Tab 1: Add Product State
-  const [productData, setProductData] = useState({ name: "", price: "", description: "", unit: "piece" });
+  const [productData, setProductData] = useState({ name: "", price: "", stock: "", description: "", unit: "piece" });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
@@ -52,8 +52,8 @@ const ModernSellerDashboard = () => {
   // --- TAB 1: ADD PRODUCT LOGIC ---
   const handleProductSubmit = async (e) => {
     e.preventDefault();
-    if (!productData.name || !productData.price || !imageFile) {
-      setStatus({ type: "error", message: "All fields and an image are required." });
+    if (!productData.name || !productData.price || productData.stock === "" || !imageFile) {
+      setStatus({ type: "error", message: "Product name, price, stock, and image are required." });
       return;
     }
     if (imageFile.size > 2 * 1024 * 1024) {
@@ -96,8 +96,8 @@ const ModernSellerDashboard = () => {
         unit: productData.unit || "piece",
         image: publicUrl,
         image_url: publicUrl, // Duplicate column sync
-        stock: 100, 
-        stock_quantity: 100, // Duplicate column sync
+        stock: Number(productData.stock),
+        stock_quantity: Number(productData.stock), // Duplicate column sync
         category: "seeds", 
         is_active: true,
         is_approved: true, // Auto-approve
@@ -116,7 +116,7 @@ const ModernSellerDashboard = () => {
       console.log("ADDED PRODUCT (Modern):", newProduct);
 
       setStatus({ type: "success", message: "Product added successfully! 🌱" });
-      setProductData({ name: "", price: "", description: "" });
+      setProductData({ name: "", price: "", stock: "", description: "", unit: "piece" });
       setImageFile(null);
       setImagePreview(null);
       fetchProducts();
@@ -179,7 +179,7 @@ const ModernSellerDashboard = () => {
   const fetchAccountDetails = async () => {
     const { data: { user } } = await db.auth.currentUser();
     if (!user) return;
-    const { data, error } = await db.from("seller_account").select("*").eq("id", user.id).single();
+    const { data } = await db.from("seller_account").select("*").eq("id", user.id).single();
     if (data) setAccountData(data);
     else setAccountData(prev => ({ ...prev, id: user.id, email: user.email }));
   };
@@ -276,6 +276,17 @@ const ModernSellerDashboard = () => {
                       <option key={key} value={key}>{value}</option>
                     ))}
                   </select>
+                </div>
+                <div className="msd-field">
+                  <label>{t('addProduct.stockLabel')} *</label>
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder={t('addProduct.stockPlaceholder')}
+                    value={productData.stock}
+                    onChange={e => setProductData({...productData, stock: e.target.value})}
+                    required
+                  />
                 </div>
                 <div className="msd-field">
                   <label>{t('addProduct.descLabel')} *</label>

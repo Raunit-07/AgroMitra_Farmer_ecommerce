@@ -10,6 +10,7 @@ const AddProduct = () => {
     price: "",
     description: "",
     unit: "piece",
+    stock: "",
   });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -47,8 +48,8 @@ const AddProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.price || !imageFile) {
-      setStatus({ type: "error", message: "Product name, price, and image are required." });
+    if (!formData.name || !formData.price || formData.stock === "" || !imageFile) {
+      setStatus({ type: "error", message: "Product name, price, stock, and image are required." });
       return;
     }
 
@@ -92,8 +93,8 @@ const AddProduct = () => {
         image: publicUrl,
         image_url: publicUrl, // Duplicate column sync
         category: "seeds", 
-        stock: 50, 
-        stock_quantity: 50, // Duplicate column sync
+        stock: Number(formData.stock),
+        stock_quantity: Number(formData.stock), // Duplicate column sync
         is_active: true,
         is_approved: true, // Auto-approve
       };
@@ -112,7 +113,7 @@ const AddProduct = () => {
 
       // Success!
       setStatus({ type: "success", message: t('addProduct.successMsg') });
-      setFormData({ name: "", price: "", description: "", unit: "piece" });
+      setFormData({ name: "", price: "", description: "", unit: "piece", stock: "" });
       setImageFile(null);
       setImagePreview(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -189,6 +190,20 @@ const AddProduct = () => {
               <option value="box">box</option>
               <option value="dozen">dozen</option>
             </select>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="stock">{t('addProduct.stockLabel')}</label>
+            <input
+              type="number"
+              id="stock"
+              name="stock"
+              placeholder={t('addProduct.stockPlaceholder')}
+              min="0"
+              value={formData.stock}
+              onChange={handleInputChange}
+              required
+            />
           </div>
 
           <div className="form-group">

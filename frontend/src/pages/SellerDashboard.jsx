@@ -99,6 +99,7 @@ export default function SellerDashboard() {
         image: formData.image.trim(),
         category: formData.category,
         stock: parseInt(formData.stock),
+        stock_quantity: parseInt(formData.stock),
       };
 
       console.log("ADDING PRODUCT:", productPayload);
