@@ -318,6 +318,11 @@
     "set_default_btn": "Set Default"
   },
   "common": {
+    "loading": "Loading...",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "total": "Total",
     "units": {
       "kg": "kg",
       "gram": "gram",

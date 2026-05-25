@@ -81,7 +81,7 @@ export default function Products() {
         <div className="products-container-pro">
            <div className="products-loading">
              <div className="loader-spinner"></div>
-             <p>{t('common.loading')}</p>
+             <p>{t('productsPage.loading')}</p>
            </div>
         </div>
       </section>
