@@ -12,12 +12,8 @@ import { QRCodeSVG } from 'qrcode.react'
 import { db } from '../lib/mongoClient'
 import axios from 'axios'
 import { useLanguage } from '../context/LanguageContext'
+import { API_BASE_URL } from '../config/api'
 import '../components/landing.css'
-const API_BASE_URL = (
-  import.meta.env.VITE_API_URL ||
-  import.meta.env.VITE_API_BASE_URL ||
-  'http://localhost:5000/api'
-).replace(/\/$/, '')
 
 // Fixed merchant UPI ID — stored in env for easy config
 const MERCHANT_UPI  = import.meta.env.VITE_MERCHANT_UPI_ID || 'abhaypandey092004-2@oksbi'

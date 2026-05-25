@@ -3,8 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { db } from '../lib/mongoClient'
 import axios from 'axios'
 import { useLanguage } from '../context/LanguageContext'
+import { API_BASE_URL } from '../config/api'
 import '../components/landing.css'
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 const STATUS_LABELS = {
   placed:     { label: 'Placed',      cls: 'status--placed' },

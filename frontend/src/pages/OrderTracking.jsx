@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+import { API_BASE_URL } from '../config/api';
 
 
 export default function OrderTracking() {
@@ -19,8 +20,7 @@ export default function OrderTracking() {
     setTrackingData(null);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
-      const res = await fetch(`${apiUrl}/orders/track/${orderIdInput}`);
+      const res = await fetch(`${API_BASE_URL}/orders/track/${orderIdInput}`);
       const data = await res.json();
 
       if (!res.ok) {

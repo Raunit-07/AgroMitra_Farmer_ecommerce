@@ -1,12 +1,4 @@
-const rawApiBaseUrl = (
-  import.meta.env.VITE_API_URL ||
-  import.meta.env.VITE_API_BASE_URL ||
-  "http://localhost:5000/api"
-).replace(/\/$/, "");
-
-const API_BASE_URL = rawApiBaseUrl.endsWith("/api")
-  ? rawApiBaseUrl
-  : `${rawApiBaseUrl}/api`;
+import { API_BASE_URL, API_ORIGIN } from "../config/api";
 
 const getToken = () => localStorage.getItem("token");
 const uploadedFiles = new Map();
@@ -296,7 +288,7 @@ export const db = {
         getPublicUrl(path) {
           return {
             data: {
-              publicUrl: `${API_BASE_URL.replace(/\/api$/, "")}${
+              publicUrl: `${API_ORIGIN}${
                 uploadedFiles.get(path) || (path?.startsWith("/uploads/") ? path : `/uploads/${path}`)
               }`,
             },

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { API_BASE_URL } from "../config/api";
 
 // define Brand/UX Constants for easy tuning
 const COLORS = {
@@ -125,8 +126,7 @@ export default function Chatbot() {
     setTyping(true);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL;
-      const res = await fetch(`${apiUrl}/chat`, {
+      const res = await fetch(`${API_BASE_URL}/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text, lang: i18n.language }),

@@ -179,8 +179,9 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, Leaf, ShieldCheck } from "lucide-react";
+import { API_BASE_URL } from "../config/api";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_URL = API_BASE_URL;
 
 export default function Login() {
   const navigate = useNavigate();
