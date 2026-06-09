@@ -1,2 +1,2 @@
 Hello this is AgroMitra
-hello team
+Welcomme to our farmer website
